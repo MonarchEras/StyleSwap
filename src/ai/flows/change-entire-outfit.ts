@@ -45,7 +45,7 @@ const changeEntireOutfitFlow = ai.defineFlow(
   },
   async input => {
     const {media} = await ai.generate({
-      model: 'googleai/nano-banana',
+      model: 'googleai/gemini-2.5-flash-image-preview',
       prompt: [
         {media: {url: input.photo1DataUri}},
         {
@@ -54,7 +54,7 @@ const changeEntireOutfitFlow = ai.defineFlow(
         {media: {url: input.photo2DataUri}},
       ],
       config: {
-        responseModalities: ['IMAGE'],
+        responseModalities: ['TEXT', 'IMAGE'],
       },
     });
     

@@ -41,13 +41,13 @@ const changeOutfitColorFlow = ai.defineFlow(
   },
   async input => {
     const {media} = await ai.generate({
-      model: 'googleai/nano-banana',
+      model: 'googleai/gemini-2.5-flash-image-preview',
       prompt: [
         {media: {url: input.photoDataUri}},
         {text: `Change the outfit color to ${input.color}`},
       ],
       config: {
-        responseModalities: ['IMAGE'],
+        responseModalities: ['TEXT', 'IMAGE'],
       },
     });
 
