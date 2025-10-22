@@ -14,12 +14,12 @@ const ChangeEntireOutfitInputSchema = z.object({
   photo1DataUri: z
     .string()
     .describe(
-      'A photo of a person, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' // Corrected typo here
+      "A photo of a person, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
   photo2DataUri: z
     .string()
     .describe(
-      'A photo of an outfit, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' // Corrected typo here
+      "A photo of an outfit, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
 export type ChangeEntireOutfitInput = z.infer<typeof ChangeEntireOutfitInputSchema>;
@@ -37,26 +37,6 @@ export async function changeEntireOutfit(
   return changeEntireOutfitFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'changeEntireOutfitPrompt',
-  input: {schema: ChangeEntireOutfitInputSchema},
-  output: {schema: ChangeEntireOutfitOutputSchema},
-  prompt: [
-    {
-      media: {url: '{{photo1DataUri}}'},
-    },
-    {
-      text: 'generate an image of this character wearing the following outfit: ',
-    },
-    {
-      media: {url: '{{photo2DataUri}}'},
-    },
-  ],
-  config: {
-    responseModalities: ['TEXT', 'IMAGE'],
-  },
-});
-
 const changeEntireOutfitFlow = ai.defineFlow(
   {
     name: 'changeEntireOutfitFlow',
@@ -65,13 +45,23 @@ const changeEntireOutfitFlow = ai.defineFlow(
   },
   async input => {
     const {media} = await ai.generate({
-      prompt,
-      model: 'googleai/gemini-2.5-flash-image-preview',
-      promptParams: input,
+      model: 'googleai/nano-banana',
+      prompt: [
+        {media: {url: input.photo1DataUri}},
+        {
+          text: 'generate an image of this character wearing the following outfit: ',
+        },
+        {media: {url: input.photo2DataUri}},
+      ],
       config: {
-        responseModalities: ['TEXT', 'IMAGE'],
+        responseModalities: ['IMAGE'],
       },
     });
-    return {editedPhotoDataUri: media!.url!};
+    
+    if (!media?.url) {
+        throw new Error('Image generation failed to return a valid data URI.');
+    }
+
+    return {editedPhotoDataUri: media.url};
   }
 );

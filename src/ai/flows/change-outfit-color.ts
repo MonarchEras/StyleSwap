@@ -33,25 +33,6 @@ export async function changeOutfitColor(
   return changeOutfitColorFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'changeOutfitColorPrompt',
-  input: {schema: ChangeOutfitColorInputSchema},
-  output: {schema: ChangeOutfitColorOutputSchema},
-  prompt: `You are an AI fashion assistant. Your task is to change the color of the outfit in the given photo to the specified color.
-
-  Instructions:
-  1.  Identify the clothing in the photo.
-  2.  Change the color of the clothing to the color specified.
-  3.  Return the modified image as a data URI.
-
-  Input Photo: {{media url=photoDataUri}}
-  Desired Color: {{{color}}}
-  Output Image: {{media}}
-  
-  Ensure the output is only the data URI of the modified image.
-  `,
-});
-
 const changeOutfitColorFlow = ai.defineFlow(
   {
     name: 'changeOutfitColorFlow',
@@ -60,16 +41,20 @@ const changeOutfitColorFlow = ai.defineFlow(
   },
   async input => {
     const {media} = await ai.generate({
+      model: 'googleai/nano-banana',
       prompt: [
         {media: {url: input.photoDataUri}},
         {text: `Change the outfit color to ${input.color}`},
       ],
-      model: 'googleai/gemini-2.5-flash-image-preview',
       config: {
-        responseModalities: ['TEXT', 'IMAGE'],
+        responseModalities: ['IMAGE'],
       },
     });
 
-    return {modifiedPhotoDataUri: media.url!};
+    if (!media?.url) {
+        throw new Error('Image generation failed to return a valid data URI.');
+    }
+
+    return {modifiedPhotoDataUri: media.url};
   }
 );
