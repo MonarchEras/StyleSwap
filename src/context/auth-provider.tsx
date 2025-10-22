@@ -20,6 +20,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -28,6 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!auth) {
+      toast({
+        title: 'Configuration Error',
+        description: 'Firebase is not configured. Please check your environment variables.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
@@ -49,6 +61,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!auth) {
+      toast({
+        title: 'Configuration Error',
+        description: 'Firebase is not configured. Please check your environment variables.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setLoading(true);
     try {
       await firebaseSignOut(auth);
