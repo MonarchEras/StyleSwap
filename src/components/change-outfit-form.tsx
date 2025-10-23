@@ -36,13 +36,23 @@ export default function ChangeOutfitForm() {
         photo2DataUri: outfitImage,
       });
       setResult(response.editedPhotoDataUri);
-    } catch (error) {
+    } catch (error: any) {
       console.error('AI generation failed:', error);
-      toast({
-        title: 'Generation Failed',
-        description: 'Something went wrong while generating the image. Please try again.',
-        variant: 'destructive',
-      });
+      const errorMessage = error.message || 'Something went wrong while generating the image. Please try again.';
+      
+      if (errorMessage.includes('429')) {
+         toast({
+          title: 'Quota Exceeded',
+          description: 'You have exceeded your API quota. Please check your plan and billing details in your Google AI account.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Generation Failed',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
     } finally {
       setLoading(false);
     }
