@@ -1,5 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,24 +13,20 @@ const firebaseConfig = {
 };
 
 // Check if all required environment variables are present
-const requiredConfig = [
-    firebaseConfig.apiKey, 
-    firebaseConfig.authDomain, 
-    firebaseConfig.projectId, 
-    firebaseConfig.storageBucket, 
-    firebaseConfig.messagingSenderId, 
-    firebaseConfig.appId
-];
+const requiredConfig = Object.values(firebaseConfig);
 
 let app;
+let auth = null;
+let db = null;
+let storage = null;
 
-if(requiredConfig.every(value => value)) {
+if (requiredConfig.every(value => value)) {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    auth = getAuth(app);
+    db = getFirestore(app);
+    storage = getStorage(app);
 } else {
     console.warn("Firebase config is incomplete. Firebase features will be disabled.");
 }
 
-
-const auth = app ? getAuth(app) : null;
-
-export { app, auth };
+export { app, auth, db, storage };

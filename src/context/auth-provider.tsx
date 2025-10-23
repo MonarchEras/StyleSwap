@@ -21,6 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!auth) {
+      console.warn("Firebase Auth is not initialized. Skipping auth state changes.");
       setLoading(false);
       return;
     }
